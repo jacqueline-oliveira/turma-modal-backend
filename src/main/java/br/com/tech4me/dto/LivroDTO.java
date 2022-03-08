@@ -1,11 +1,6 @@
-package br.com.tech4me.tech4books.model;
+package br.com.tech4me.dto;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-@Document("livros")
-public class Livro {
-    @Id
+public class LivroDTO {
     private String id;
     private String titulo;
     private String autor;
@@ -15,24 +10,6 @@ public class Livro {
     private Double precoCusto;
     private Double margemLucro;
     
-    public Double getValor() {
-        return valor;
-    }
-    public void setValor(Double valor) {
-        this.valor = valor;
-    }
-    public Double getPrecoCusto() {
-        return precoCusto;
-    }
-    public void setPrecoCusto(Double precoCusto) {
-        this.precoCusto = precoCusto;
-    }
-    public Double getMargemLucro() {
-        return margemLucro;
-    }
-    public void setMargemLucro(Double margemLucro) {
-        this.margemLucro = margemLucro;
-    }
     public String getId() {
         return id;
     }
@@ -63,8 +40,24 @@ public class Livro {
     public void setAnoLancamento(Integer anoLancamento) {
         this.anoLancamento = anoLancamento;
     }
-
-   
+    public Double getValor() {
+        return valor;
+    }
+    public void setValor(Double valor) {
+        this.valor = valor;
+    }
+    public Double getPrecoCusto() {
+        return precoCusto;
+    }
+    public void setPrecoCusto(Double precoCusto) {
+        this.precoCusto = precoCusto;
+    }
+    public Double getMargemLucro() {
+        return margemLucro;
+    }
+    public void setMargemLucro(Double margemLucro) {
+        this.margemLucro = margemLucro;
+    }
 
     
     

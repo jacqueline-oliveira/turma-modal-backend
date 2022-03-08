@@ -2,7 +2,9 @@ package br.com.tech4me.tech4books.controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,25 +17,35 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.tech4me.dto.LivroDTO;
 import br.com.tech4me.tech4books.model.Livro;
-import br.com.tech4me.tech4books.repository.LivroRepository;
+import br.com.tech4me.tech4books.service.LivroService;
+import br.com.tech4me.tech4books.view.model.LivroResponseDTO;
 
 @RestController
 @RequestMapping("/api/livros")
 public class LivroController {
 
     @Autowired
-    private LivroRepository repositorio;
+    private LivroService servico;
     
     @GetMapping
-    public ResponseEntity<List<Livro>> obterLivros() {
-        return new ResponseEntity<>(repositorio.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<LivroResponseDTO>> obterLivros() {
+        List<LivroDTO> dto = servico.obterTodosOsLivros();
+
+        ModelMapper mapper = new ModelMapper();
+        
+        List<LivroResponseDTO> livros = dto.stream()
+           .map(l -> mapper.map(l, LivroResponseDTO.class))
+           .collect(Collectors.toList());
+
+        return new ResponseEntity<>(livros, HttpStatus.OK);
     }
 
 
     @GetMapping("/{id}")
     public ResponseEntity<Livro> obterLivroPorId(@PathVariable String id){
-       Optional<Livro> livro = repositorio.findById(id);
+       Optional<Livro> livro = servico.obterLivroPorId(id);
 
        if (livro.isPresent()) {
         return new ResponseEntity<>(livro.get(), HttpStatus.FOUND);
@@ -44,19 +56,18 @@ public class LivroController {
 
     @PostMapping
     public ResponseEntity<Livro> cadastrarLivro(@RequestBody Livro livro) {
-        return new ResponseEntity<>(repositorio.save(livro), HttpStatus.CREATED);
+        return new ResponseEntity<>(servico.armazenarLivro(livro), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluirLivro(@PathVariable String id) {
-        repositorio.deleteById(id);
+        servico.excluirLivroPorId(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Livro> atualizarLivro(@PathVariable String id, @RequestBody Livro livro) {
-        livro.setId(id);
-        return new ResponseEntity<>(repositorio.save(livro), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(servico.atualizarLivro(id, livro), HttpStatus.ACCEPTED);
     }
 
 }
