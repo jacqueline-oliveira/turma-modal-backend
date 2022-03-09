@@ -14,6 +14,7 @@ import br.com.tech4me.tech4books.repository.LivroRepository;
 
 @Service
 public class LivroServiceImpl implements LivroService {
+    ModelMapper mapper = new ModelMapper();
 
     @Autowired
     private LivroRepository repositorio;
@@ -21,8 +22,6 @@ public class LivroServiceImpl implements LivroService {
     @Override
     public List<LivroDTO> obterTodosOsLivros() {
         List<Livro> livros = repositorio.findAll();
-
-        ModelMapper mapper = new ModelMapper();
         
         return livros.stream()
                 .map(l -> mapper.map(l, LivroDTO.class))
@@ -30,13 +29,22 @@ public class LivroServiceImpl implements LivroService {
     }
 
     @Override
-    public Optional<Livro> obterLivroPorId(String id) {
-        return repositorio.findById(id);
+    public Optional<LivroDTO> obterLivroPorId(String id) {
+        Optional<Livro> livro = repositorio.findById(id);
+
+        if(livro.isPresent()) {
+            return Optional.of(mapper.map(livro.get(), LivroDTO.class));
+        }
+
+        return Optional.empty();
     }
 
     @Override
-    public Livro armazenarLivro(Livro livro) {
-        return repositorio.save(livro);
+    public LivroDTO armazenarLivro(LivroDTO livro) {
+        Livro livroGravar = mapper.map(livro, Livro.class);
+        livroGravar = repositorio.save(livroGravar);
+        
+        return mapper.map(livroGravar, LivroDTO.class);
     }
 
     @Override
@@ -46,9 +54,12 @@ public class LivroServiceImpl implements LivroService {
     }
 
     @Override
-    public Livro atualizarLivro(String id, Livro livro) {
-        livro.setId(id);
-        return repositorio.save(livro);
+    public LivroDTO atualizarLivro(String id, LivroDTO livro) {
+        Livro livroAtualizar = mapper.map(livro, Livro.class);
+        livroAtualizar.setId(id);
+        livroAtualizar = repositorio.save(livroAtualizar);
+
+        return mapper.map(livroAtualizar, LivroDTO.class);
     }
     
 }
